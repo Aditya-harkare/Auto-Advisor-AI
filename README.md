@@ -37,6 +37,19 @@ This modular architecture improves reasoning quality, transparency, maintainabil
 
 ---
 
+## Sample Output on Terminal
+run main.py for testing the project
+<details>
+<summary>📸 Click to view the complete terminal output</summary>
+
+<br>
+
+![Terminal Output](combined-image.jpg)
+
+</details>
+
+---
+
 ## Workflow
 
 ```mermaid
