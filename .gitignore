@@ -1,21 +1,45 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+
 # Virtual Environment
 .venv/
+venv/
+env/
 
 # Environment Variables
 .env
 
-# Python Cache
-__pycache__/
-*.pyc
-
 # VS Code
 .vscode/
 
-# Streamlit
-.streamlit/
+# PyCharm
+.idea/
 
-# macOS
+# Python cache
+.pytest_cache/
+.mypy_cache/
+
+# OS
 .DS_Store
-
-# Windows
 Thumbs.db
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Logs
+*.log
+
+# Build
+dist/
+build/
+*.egg-info/
+
+# LangSmith (if used)
+.langsmith/
+
+# Misc
+*.sqlite3
