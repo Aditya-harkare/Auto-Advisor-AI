@@ -39,28 +39,86 @@ This modular architecture improves reasoning quality, transparency, maintainabil
 
 ## Workflow
 
-User Query
-↓
-Requirement Agent
-↓
-Vehicle Repository
-↓
-Candidate Selection Agent
-↓
-Evaluation Agent
-├──────────────┐
-│              │
-↓              ↓
-Recommendation Purchase Advisory
-Agent          Agent
-│              │
-└───────┬──────┘
-        ↓
-Response Composer
-        ↓
-Final Report
+```mermaid
+flowchart TD
+
+    A[User Query]
+    B[Requirement Agent]
+    C[Vehicle Repository]
+    D[Candidate Selection Agent]
+    E[Evaluation Agent]
+    F[Recommendation Agent]
+    G[Purchase Advisory Agent]
+    H[Response Composer]
+    I[Final Consultation Report]
+
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
+    E --> G
+    F --> H
+    G --> H
+    H --> I
+```
 
 ---
+
+## State Management
+
+AutoAdvisor AI uses **LangGraph's Shared Global State** architecture for communication between agents.
+
+A single `AutoAdvisorState` object is shared across the entire workflow. Each agent reads only the information it requires and writes only its own outputs back to the shared state. This approach provides a simple and efficient mechanism for passing information between sequential and parallel stages while keeping agents loosely coupled.
+
+### State Flow
+
+```text
+User Query
+    │
+    ▼
+requirements
+    │
+    ▼
+candidate_cars
+    │
+    ▼
+selected_models
+    │
+    ▼
+evaluations
+   ┌───────────────┐
+   ▼               ▼
+recommendation   purchase_advisory
+   └───────┬──────┘
+           ▼
+consultation_report
+```
+
+### Shared State Structure
+
+| State Key | Produced By | Consumed By |
+|-----------|-------------|-------------|
+| `user_query` | User | Requirement Agent |
+| `requirements` | Requirement Agent | Repository, Recommendation Agent, Purchase Advisory Agent |
+| `candidate_cars` | Repository | Candidate Selection Agent |
+| `selected_models` | Candidate Selection Agent | Evaluation Agent |
+| `evaluations` | Evaluation Agent | Recommendation Agent, Purchase Advisory Agent |
+| `recommendation` | Recommendation Agent | Response Composer |
+| `purchase_advisory` | Purchase Advisory Agent | Response Composer |
+| `consultation_report` | Response Composer | Final Output |
+| `execution_log` | All Agents | Main Application |
+
+### Why Shared Global State?
+
+This project follows the **Shared Global State** pattern recommended by LangGraph for **pipeline and parallel workflows** because:
+
+- Information flows sequentially from one agent to the next.
+- Parallel agents (Recommendation Agent and Purchase Advisory Agent) can independently read the evaluation results without duplicating work.
+- Each agent is responsible for updating only its designated state fields, preventing unnecessary coupling between agents.
+- The architecture remains modular and allows new agents to be added with minimal changes to existing components.
+
+The `execution_log` field is implemented using an append-only strategy (`Annotated[list, operator.add]`), allowing multiple parallel agents to safely contribute workflow logs without overwriting each other.
 
 ## Multi-Agent Architecture
 
